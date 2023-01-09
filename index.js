@@ -7,25 +7,25 @@ inquirer
         {
             type: 'input',
             message: "Please enter your team manager's name",
-            name: 'managerName'
+            name: 'name'
         },
 
         {
             type: 'input',
             message: "Please enter your team manager's employee ID",
-            name: 'managerID'
+            name: 'id'
         },
 
         {
             type: 'input',
             message: "Please enter your team manager's email address",
-            name: 'managerEmail'
+            name: 'email'
         },
 
         {
             type: 'input',
             message: "Please enter your team manager's office number",
-            name: 'managerOffice'
+            name: 'office'
         },
 
     ])
@@ -67,29 +67,31 @@ const askIntern = () => {
         {
             type: 'input',
             message: "Please enter your intern's name",
-            name: 'internName'
+            name: 'name'
         },
 
         {
             type: 'input',
             message: "Please enter your intern's employee ID",
-            name: 'internID'
+            name: 'id'
         },
 
         {
             type: 'input',
             message: "Please enter your intern's email address",
-            name: 'internEmail'
+            name: 'email'
         },
 
         {
             type: 'input',
             message: "Please enter your intern'school",
-            name: 'internSchool'
+            name: 'school'
         },
 
-    ).then(
+    ).then(answers => {
+        makeProfile(answers, "intern")
         nextEmployee()
+    }     
     )
 }
 
@@ -99,27 +101,29 @@ const askEngineer = () => {
         {
             type: 'input',
             message: "Please enter your engineer's name",
-            name: 'engineerName'
+            name: 'name'
         },
 
         {
             type: 'input',
             message: "Please enter your engineer's employee ID",
-            name: 'engineerID'
+            name: 'id'
         },
 
         {
             type: 'input',
             message: "Please enter your engineer's email address",
-            name: 'engineerEmail'
+            name: 'email'
         },
 
         {
             type: 'input',
             message: "Please enter your engineer's Github username",
-            name: 'engineerGithub'
+            name: 'github'
         },
-    ).then(
+    ).then(answers => {
+        makeProfile(answers, "engineer")
         nextEmployee()
+    }     
     )
 }
