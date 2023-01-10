@@ -1,5 +1,13 @@
 const inquirer = require('inquirer')
-const makeProfile = require('makeProfile')
+const fs = require("fs");
+
+const Manager = require("./lib/manager")
+const Engineer = require("./lib/engineer")
+const Intern = require("./lib/intern")
+
+// 
+// IQUIRER Prompts
+//
 
 // first inquirer asks about manager information
 inquirer
@@ -35,7 +43,7 @@ inquirer
         
     })
 
-
+// gives an inquirer prompt asking what the next employee type is
 const nextEmployee = () => {
     inquirer
     .prompt([
@@ -49,6 +57,7 @@ const nextEmployee = () => {
     )
 }
 
+// given a certain employee type, asks questions
 const promptNextEmployee = answers => {
         
     if (answers.choices === 'intern') {
@@ -59,7 +68,7 @@ const promptNextEmployee = answers => {
         finishHtml()
     }
     }
-    
+// asks roster questions for intern then asks for next employee
 const askIntern = () => {
 
     inquirer
@@ -95,6 +104,7 @@ const askIntern = () => {
     )
 }
 
+// asks roster questions for engineer then asks for next employee
 const askEngineer = () => {
     inquirer
     .prompt(
@@ -126,4 +136,99 @@ const askEngineer = () => {
         nextEmployee()
     }     
     )
+}
+
+// 
+// Generating HTML
+// 
+
+// starter html script
+const html = `<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Profile</title>
+</head>
+
+<body>
+    <h1>My Team</h1>`;
+ 
+// end of html script
+const endHtml = `
+    </body>
+
+    </html>`;
+
+// card formatting function
+const createCard = (name, position, id, email, thirdItem) => {
+    let card = `
+    <div class="card" style="width: 18rem;">
+    <div class="card-body">
+        <h5 class="card-title">${name}/h5>
+        <p class="card-text">${position}</p>
+    </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Id: ${id}</li>
+        <li class="list-group-item">email: ${email}</li>
+        <li class="list-group-item">${thirdItem}</li>
+      </ul>
+    </div>`;
+    return card
+
+}
+
+// choose card type by job title
+const makeProfile = (answers, position) => {
+    let card;
+    if (position == 'manager') {
+        card = makeManager(answers)
+    } else if (position == 'engineer') {
+        card = makeEngineer(answers)
+    } else if (position == 'intern') {
+        card = makeIntern(answers)
+    } else {
+        let err = new Error("Can't find employee position");
+        console.error(err)
+    }
+    console.log(card)
+    html.concatenate(card)
+
+}
+
+// create manager card
+const makeManager = (answers) => {
+    let manager = new Manager(answers)
+    let office = `Office Number: ${manager.getOffice()}`
+    let card = createCard(manager.getName(), manager.getRole(), manager.getId(), manager.getEmail(), office);
+    console.log(manager)
+    return card
+
+}
+
+// create engineer card
+const makeEngineer = (answers) => {
+    let engineer = new Engineer(answers);
+    let github = `Github: ${engineer.getGithub()}`;
+    let card = createCard(engineer.getName(), engineer.getRole(), engineer.getId(), engineer.getEmail(), github);
+    console.log(engineer);
+    return card
+}
+
+// create intern card
+const makeIntern = (answers) => {
+    let intern = new Intern(answers);
+    let school = `School: ${intern.getSchool()}`;
+    let card = createCard(intern.getName(), intern.getRole(), intern.getId(), intern.getEmail(), school);
+    console.log(intern)
+    return card
+}
+
+// write html to file
+const finishHtml = (html) => {
+    html.concatenate(endHtml);
+    fs.writeFile('index.html', html, (err) =>
+    err ? console.error(err) : console.log('Success!')
+    );
 }
