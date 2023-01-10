@@ -10,7 +10,8 @@ const Intern = require("./lib/intern")
 //
 
 // first inquirer asks about manager information
-inquirer
+const inquire = () => {
+    inquirer
     .prompt([
         {
             type: 'input',
@@ -38,41 +39,47 @@ inquirer
 
     ])
     .then(answers => {
-        makeProfile(answers, 'manager')
+        makeProfile(answers, 'manager')       
+    }).then(()=> {
+        console.log("HI")
         nextEmployee()
-        
     })
+}
+
 
 // gives an inquirer prompt asking what the next employee type is
 const nextEmployee = () => {
     inquirer
     .prompt([
         {
-        type: 'rawlist',
+        type: 'list',
         message: "Would you like to add another employee?",
-        choices: ['intern', 'engineer', 'no more employees']   
+        choices: ['intern', 'engineer', 'no more employees'],  
+        name: "position"
         }
-    ]).then(
+    ]).then(answers => {
+        console.log(answers)
         promptNextEmployee(answers)
+    }        
     )
 }
 
 // given a certain employee type, asks questions
 const promptNextEmployee = answers => {
-        
-    if (answers.choices === 'intern') {
+        console.log(answers)
+    if (answers.position == 'intern') {
         askIntern()
-    } else if (answers.choices === 'engineer') {
+    } else if (answers.position == 'engineer') {
         askEngineer()
     } else {
-        finishHtml()
+        finishHtml(html)
     }
     }
 // asks roster questions for intern then asks for next employee
 const askIntern = () => {
-
+    console.log("hi")
     inquirer
-    .prompt(
+    .prompt([
         {
             type: 'input',
             message: "Please enter your intern's name",
@@ -93,11 +100,15 @@ const askIntern = () => {
 
         {
             type: 'input',
-            message: "Please enter your intern'school",
+            message: "Please enter your intern's school",
             name: 'school'
         },
+    ]
+        
 
-    ).then(answers => {
+    )
+    .then(answers => {
+        console.log(answers)
         makeProfile(answers, "intern")
         nextEmployee()
     }     
@@ -107,7 +118,7 @@ const askIntern = () => {
 // asks roster questions for engineer then asks for next employee
 const askEngineer = () => {
     inquirer
-    .prompt(
+    .prompt([
         {
             type: 'input',
             message: "Please enter your engineer's name",
@@ -131,6 +142,7 @@ const askEngineer = () => {
             message: "Please enter your engineer's Github username",
             name: 'github'
         },
+    ]
     ).then(answers => {
         makeProfile(answers, "engineer")
         nextEmployee()
@@ -143,7 +155,7 @@ const askEngineer = () => {
 // 
 
 // starter html script
-const html = `<html lang="en">
+let html = `<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -166,12 +178,12 @@ const createCard = (name, position, id, email, thirdItem) => {
     let card = `
     <div class="card" style="width: 18rem;">
     <div class="card-body">
-        <h5 class="card-title">${name}/h5>
+        <h5 class="card-title">${name}</h5>
         <p class="card-text">${position}</p>
     </div>
       <ul class="list-group list-group-flush">
         <li class="list-group-item">Id: ${id}</li>
-        <li class="list-group-item">email: ${email}</li>
+        <li class="list-group-item">email: <a href = "mailto: ${email}">${email}</a></li>
         <li class="list-group-item">${thirdItem}</li>
       </ul>
     </div>`;
@@ -180,21 +192,23 @@ const createCard = (name, position, id, email, thirdItem) => {
 }
 
 // choose card type by job title
-const makeProfile = (answers, position) => {
+const makeProfile = async (answers, position) => {
     let card;
     if (position == 'manager') {
-        card = makeManager(answers)
+         card = await makeManager(answers)
     } else if (position == 'engineer') {
-        card = makeEngineer(answers)
+        card = await makeEngineer(answers)
+        console.log(`card: ${card}`)
     } else if (position == 'intern') {
-        card = makeIntern(answers)
+        card = await makeIntern(answers)
     } else {
         let err = new Error("Can't find employee position");
         console.error(err)
     }
-    console.log(card)
-    html.concatenate(card)
-
+    
+    html = `${html}
+    ${card}`;
+    console.log(html)
 }
 
 // create manager card
@@ -203,17 +217,28 @@ const makeManager = (answers) => {
     let office = `Office Number: ${manager.getOffice()}`
     let card = createCard(manager.getName(), manager.getRole(), manager.getId(), manager.getEmail(), office);
     console.log(manager)
-    return card
+    return new Promise ((resolve, reject) => {
+        resolve(card)
+    })
+    
 
 }
 
 // create engineer card
-const makeEngineer = (answers) => {
+const makeEngineer = async (answers) => {
+    let github
+    let card
     let engineer = new Engineer(answers);
-    let github = `Github: ${engineer.getGithub()}`;
-    let card = createCard(engineer.getName(), engineer.getRole(), engineer.getId(), engineer.getEmail(), github);
-    console.log(engineer);
-    return card
+    // make this into a promise
+    let link = await engineer.getGithub();
+    github = `Github: ${link}`;
+    card = createCard(engineer.getName(), engineer.getRole(), engineer.getId(), engineer.getEmail(), github);
+    console.log(`card: ${card}`)
+
+    return new Promise((resolve, reject) => {
+        resolve(card)
+    })
+    
 }
 
 // create intern card
@@ -222,13 +247,21 @@ const makeIntern = (answers) => {
     let school = `School: ${intern.getSchool()}`;
     let card = createCard(intern.getName(), intern.getRole(), intern.getId(), intern.getEmail(), school);
     console.log(intern)
-    return card
+    return new Promise((resolve, reject) => {
+        resolve(card)
+    })
 }
 
 // write html to file
 const finishHtml = (html) => {
-    html.concatenate(endHtml);
+    html = `${html}
+    ${(endHtml)}`;
     fs.writeFile('index.html', html, (err) =>
     err ? console.error(err) : console.log('Success!')
     );
 }
+
+
+// Run script
+
+inquire()
