@@ -41,7 +41,6 @@ const inquire = () => {
     .then(answers => {
         makeProfile(answers, 'manager')       
     }).then(()=> {
-        console.log("HI")
         nextEmployee()
     })
 }
@@ -54,11 +53,10 @@ const nextEmployee = () => {
         {
         type: 'list',
         message: "Would you like to add another employee?",
-        choices: ['intern', 'engineer', 'no more employees'],  
+        choices: ['engineer', 'intern', 'no more employees'],  
         name: "position"
         }
     ]).then(answers => {
-        console.log(answers)
         promptNextEmployee(answers)
     }        
     )
@@ -66,7 +64,6 @@ const nextEmployee = () => {
 
 // given a certain employee type, asks questions
 const promptNextEmployee = answers => {
-        console.log(answers)
     if (answers.position == 'intern') {
         askIntern()
     } else if (answers.position == 'engineer') {
@@ -77,7 +74,6 @@ const promptNextEmployee = answers => {
     }
 // asks roster questions for intern then asks for next employee
 const askIntern = () => {
-    console.log("hi")
     inquirer
     .prompt([
         {
@@ -108,7 +104,6 @@ const askIntern = () => {
 
     )
     .then(answers => {
-        console.log(answers)
         makeProfile(answers, "intern")
         nextEmployee()
     }     
@@ -161,23 +156,26 @@ let html = `<html lang="en">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <title>Team Profile</title>
 </head>
 
 <body>
-    <h1>My Team</h1>`;
+    <h1 class="text-center header w-100 py-4 align-middle" style="background-color: rgba(0,0,255,.1)">My Team</h1>
+    <sec class="d-flex flex-row flex-wrap justify-content-around align-items-center">`;
  
 // end of html script
 const endHtml = `
-    </body>
+</sec>    
+</body>
 
     </html>`;
 
 // card formatting function
 const createCard = (name, position, id, email, thirdItem) => {
     let card = `
-    <div class="card" style="width: 18rem;">
-    <div class="card-body">
+    <div class="card my-2" style="width: 18rem;">
+    <div class="card-body" style="background-color: rgba(0,0,255,.1)">
         <h5 class="card-title">${name}</h5>
         <p class="card-text">${position}</p>
     </div>
@@ -198,7 +196,6 @@ const makeProfile = async (answers, position) => {
          card = await makeManager(answers)
     } else if (position == 'engineer') {
         card = await makeEngineer(answers)
-        console.log(`card: ${card}`)
     } else if (position == 'intern') {
         card = await makeIntern(answers)
     } else {
@@ -208,7 +205,6 @@ const makeProfile = async (answers, position) => {
     
     html = `${html}
     ${card}`;
-    console.log(html)
 }
 
 // create manager card
@@ -216,7 +212,6 @@ const makeManager = (answers) => {
     let manager = new Manager(answers)
     let office = `Office Number: ${manager.getOffice()}`
     let card = createCard(manager.getName(), manager.getRole(), manager.getId(), manager.getEmail(), office);
-    console.log(manager)
     return new Promise ((resolve, reject) => {
         resolve(card)
     })
@@ -231,9 +226,8 @@ const makeEngineer = async (answers) => {
     let engineer = new Engineer(answers);
     // make this into a promise
     let link = await engineer.getGithub();
-    github = `Github: ${link}`;
+    github = `Github: <a href='${link}' target=_blank>${engineer.getGithubName()}</a>`;
     card = createCard(engineer.getName(), engineer.getRole(), engineer.getId(), engineer.getEmail(), github);
-    console.log(`card: ${card}`)
 
     return new Promise((resolve, reject) => {
         resolve(card)
@@ -246,7 +240,6 @@ const makeIntern = (answers) => {
     let intern = new Intern(answers);
     let school = `School: ${intern.getSchool()}`;
     let card = createCard(intern.getName(), intern.getRole(), intern.getId(), intern.getEmail(), school);
-    console.log(intern)
     return new Promise((resolve, reject) => {
         resolve(card)
     })

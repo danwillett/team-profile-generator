@@ -1,5 +1,17 @@
 {
+  "name": "team-profile-generator",
+  "version": "1.0.0",
+  "description": "Generates simple team roster html from command line prompts",
+  "main": "index.js",
   "dependencies": {
     "inquirer": "^8.2.4"
+  }, 
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "danwillett",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }
