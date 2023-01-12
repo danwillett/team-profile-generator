@@ -1,4 +1,5 @@
 const inquirer = require('inquirer')
+const path = require('path')
 const fs = require("fs");
 
 const Manager = require("./lib/manager")
@@ -249,7 +250,7 @@ const makeIntern = (answers) => {
 const finishHtml = (html) => {
     html = `${html}
     ${(endHtml)}`;
-    fs.writeFile('index.html', html, (err) =>
+    fs.writeFile(path.join(__dirname, '/dist/index.html'), html, (err) =>
     err ? console.error(err) : console.log('Success!')
     );
 }
